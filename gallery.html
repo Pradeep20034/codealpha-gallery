@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .filter-bar {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .filter-bar button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .filter-bar button:hover {
+      background: #222;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      padding: 0 20px 40px;
+    }
+
+    .gallery img {
+      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    /* Lightbox modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .overlay img {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+
+    .controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      color: #fff;
+      background: rgba(0,0,0,0.4);
+      padding: 10px;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 50%;
+    }
+
+    .controls.left {
+      left: 20px;
+    }
+
+    .controls.right {
+      right: 20px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      font-size: 1.8rem;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 10px;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>My Image Gallery</h2>
+
+  <div class="filter-bar">
+    <button onclick="filter('all')">All</button>
+    <button onclick="filter('nature')">Nature</button>
+    <button onclick="filter('city')">City</button>
+    <button onclick="filter('people')">People</button>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <img src="https://source.unsplash.com/400x300/?nature,river" data-cat="nature" />
+    <img src="https://source.unsplash.com/400x300/?city,night" data-cat="city" />
+    <img src="https://source.unsplash.com/400x300/?people,portrait" data-cat="people" />
+    <img src="https://source.unsplash.com/400x300/?nature,tree" data-cat="nature" />
+    <img src="https://source.unsplash.com/400x300/?city,street" data-cat="city" />
+    <img src="https://source.unsplash.com/400x300/?people,smile" data-cat="people" />
+  </div>
+
+  <div class="overlay" id="lightbox">
+    <span class="close-btn" onclick="closeLightbox()">✕</span>
+    <span class="controls left" onclick="navigate(-1)">‹</span>
+    <img src="" id="lightbox-img" />
+    <span class="controls right" onclick="navigate(1)">›</span>
+  </div>
+
+  <script>
+    const galleryImgs = document.querySelectorAll('#gallery img');
+    const overlay = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    let current = 0;
+
+    // Open lightbox
+    galleryImgs.forEach((img, idx) => {
+      img.addEventListener('click', () => {
+        current = idx;
+        showImg(img.src);
+      });
+    });
+
+    function showImg(src) {
+      overlay.style.display = 'flex';
+      lightboxImg.src = src;
+    }
+
+    function closeLightbox() {
+      overlay.style.display = 'none';
+    }
+
+    function navigate(step) {
+      current += step;
+      if (current < 0) current = galleryImgs.length - 1;
+      if (current >= galleryImgs.length) current = 0;
+      lightboxImg.src = galleryImgs[current].src;
+    }
+
+    function filter(cat) {
+      galleryImgs.forEach(img => {
+        const match = img.dataset.cat === cat || cat === 'all';
+        img.style.display = match ? 'block' : 'none';
+      });
+    }
+
+    // Escape key closes overlay
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft') navigate(-1);
+    });
+  </script>
+
+</body>
+</html>
